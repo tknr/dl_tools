@@ -1,0 +1,59 @@
+#!/bin/bash
+pip install -qqq -U streamlink || exit 1
+export IFS=$'\n'
+CMDNAME=`basename $0`
+FILENAME_QUEUE="queue_streamlink.txt"
+
+usage_exit() {
+        echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+        exit 1
+}
+
+mark_finished(){
+        sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+DL_BASEDIR=`pwd`
+source ~/.config/dl_streamlink/config
+mkdir -p ${DL_BASEDIR} 
+cd ${DL_BASEDIR}
+
+while getopts q:h OPT
+do
+    case $OPT in
+        q)  FILENAME_QUEUE=$OPTARG
+            ;;
+        h)  usage_exit
+            ;;
+        \?) usage_exit
+            ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+
+        TITLE=`echo ${LINE} | cut -f 1`
+	URL=`echo ${LINE} | cut -f 2`
+
+	if [ ${TITLE} = ${URL} ] ; then 
+		TITLE=''
+	fi
+
+	echo ${TITLE}
+	echo ${URL}
+
+        if [ ${#URL} -lt 7 ] ; then
+                continue
+        fi
+
+	if [ ${#TITLE} = 0 ] ; then
+		continue
+	else
+		streamlink --hls-live-restart ${URL} best -o ${TITLE}.ts || continue
+		mark_finished "${LINE}" "${FILENAME_QUEUE}"
+	fi
+done

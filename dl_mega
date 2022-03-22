@@ -1,0 +1,39 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+
+FILENAME_QUEUE="queue_mega.nz.txt"
+
+usage_exit() {
+        echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+        exit 1
+}
+MEGA_BASEDIR=`pwd`
+
+source ~/.config/dl_mega/config
+
+mkdir -p MEGA_BASEDIR}
+
+while getopts q:h OPT
+do
+    case $OPT in
+        q)  FILENAME_QUEUE=$OPTARG
+            ;;
+        h)  usage_exit
+            ;;
+        \?) usage_exit
+            ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+mark_finished(){
+        sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+for URL in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+	mega-get --ignore-quota-warn ${URL} && mark_finished "${URL}" "${FILENAME_QUEUE}"
+done

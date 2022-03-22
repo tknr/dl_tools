@@ -1,0 +1,57 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+
+## curl -i -b ~/.config/cookie/all.txt "https://download.developer.apple.com/Developer_Tools/Xcode_13.1/Xcode_13.1.xip" -O
+
+
+FILENAME_QUEUE="queue_curl.txt"
+COMMAND="time nice -n 19 curl -k -L -i"
+LOAD_COOKIE_PATH=/dev/null
+
+usage_exit() {
+        echo "Usage: ${CMDNAME} [-c cookie txt path] [-q queue_filename]" 1>&2
+        exit 1
+}
+
+source ~/.config/dl_curl/config
+
+while getopts c:q:h OPT
+do
+    case $OPT in
+	c)  LOAD_COOKIE_PATH=$OPTARG ;;
+        q)  FILENAME_QUEUE=$OPTARG ;;
+        h)  usage_exit ;;
+        \?) usage_exit ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+mark_finished(){
+        sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+
+        TITLE=`echo ${LINE} | cut -f 1`
+	URL=`echo ${LINE} | cut -f 2`
+
+	if [ ${TITLE} = ${URL} ] ; then 
+		TITLE=''
+	fi
+
+        if [ ${#URL} -lt 2 ] ; then
+                continue
+        fi
+
+	if [ ${#TITLE} = 0 ] ; then
+		eval ${COMMAND} -b ${LOAD_COOKIE_PATH} ${URL} -O || continue
+		mark_finished "${LINE}" "${FILENAME_QUEUE}"
+	else
+		eval ${COMMAND} -b ${LOAD_COOKIE_PATH} ${URL} -o ${TITLE} || continue
+		mark_finished "${LINE}" "${FILENAME_QUEUE}"
+	fi
+done

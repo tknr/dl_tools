@@ -1,0 +1,92 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+FILENAME_QUEUE="queue_youtube.txt"
+
+usage_exit() {
+        echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+        exit 1
+}
+
+mark_finished(){
+        sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+DL_COMMAND=
+if type "yt-dlp" > /dev/null 2>&1 ; then
+	DL_COMMAND="yt-dlp"
+elif type "youtube-dl" > /dev/null 2>&1 ; then
+	DL_COMMAND="youtube-dl"
+else
+	echo "not installed yt-dlp nor youtube-dl ."
+	exit 1
+fi
+
+DL_BASEDIR=`pwd`
+USE_COOKIEFILE=false
+COOKIEFILE=
+source ~/.config/dl_youtube/config
+mkdir -p ${DL_BASEDIR}
+cd ${DL_BASEDIR}
+
+while getopts q:h OPT
+do
+    case $OPT in
+        q)  FILENAME_QUEUE=$OPTARG
+            ;;
+        h)  usage_exit
+            ;;
+        \?) usage_exit
+            ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+
+        TITLE=`echo ${LINE} | cut -f 1`
+	URL=`echo ${LINE} | cut -f 2`
+
+	if [ ${TITLE} = ${URL} ] ; then 
+		TITLE=''
+	fi
+
+
+	echo ${TITLE}
+	echo ${URL}
+
+        if [ ${#URL} -lt 7 ] ; then
+                continue
+        fi
+
+
+	if [ `echo ${URL} | grep 'gyao'` ]; then
+		echo ${URL} | nkf -w --url-input	
+	fi
+
+
+	if "${USE_COOKIEFILE}"; then
+                eval ${DL_COMMAND} --cookies ${COOKIEFILE} --list-formats ${URL} || continue
+                eval ${DL_COMMAND} --cookies ${COOKIEFILE} --list-subs ${URL} || continue
+                if [ ${#TITLE} = 0 ] ; then
+                        eval ${DL_COMMAND} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} || continue
+                        mark_finished "${LINE}" "${FILENAME_QUEUE}"
+                else
+                        eval ${DL_COMMAND} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                        mark_finished "${LINE}" "${FILENAME_QUEUE}"
+                fi
+	else
+        	eval ${DL_COMMAND} --list-formats ${URL} || continue
+        	eval ${DL_COMMAND} --list-subs ${URL} || continue
+		if [ ${#TITLE} = 0 ] ; then
+			eval ${DL_COMMAND} --encoding utf-8 --all-subs ${URL} || continue
+			mark_finished "${LINE}" "${FILENAME_QUEUE}"
+		else
+			eval ${DL_COMMAND} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+			mark_finished "${LINE}" "${FILENAME_QUEUE}"
+		fi
+	fi
+done

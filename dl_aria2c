@@ -1,0 +1,70 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+
+FILENAME_QUEUE="queue_aria2c.txt"
+COMMAND="time aria2c"
+MAX_CONNECTIONS_PER_SERVER=5
+SPLIT=5
+MIN_SPLIT_SIZE="20M"
+CONTINUE=false
+FORCE_SEQUENTIAL=false
+LOAD_COOKIE_PATH=""
+
+usage_exit() {
+        echo "Usage: ${CMDNAME} [-x max-connection-per-server] [-s split] [-k min-split-size] [-q queue_filename]" 1>&2
+        exit 1
+}
+
+source ~/.config/dl_aria2c/config
+
+while getopts x:s:q:h OPT
+do
+    case $OPT in
+        x)  MAX_CONNECTIONS_PER_SERVER=$OPTARG
+            ;;
+	s)  SPLIT=$OPTARG
+	    ;;
+	k)  MIN_SPLIT_SIZE=$OPTARG
+	    ;;
+        q)  FILENAME_QUEUE=$OPTARG
+            ;;
+        h)  usage_exit
+            ;;
+        \?) usage_exit
+            ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+mark_finished(){
+        sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+
+        TITLE=`echo ${LINE} | cut -f 1`
+	URL=`echo ${LINE} | cut -f 2`
+
+	if [ ${TITLE} = ${URL} ] ; then 
+		TITLE=''
+	fi
+
+        if [ ${#URL} -lt 2 ] ; then
+                continue
+        fi
+
+
+	TARGET_URL=`curl -I -Ls -o /dev/null -w %{url_effective} "${URL}"`
+
+	if [ ${#TITLE} = 0 ] ; then
+		eval ${COMMAND} -x${MAX_CONNECTIONS_PER_SERVER} -s${SPLIT} -k${MIN_SPLIT_SIZE} --continue=${CONTINUE} --force-sequential=${FORCE_SEQUENTIAL} --load-cookies=${LOAD_COOKIE_PATH} "${TARGET_URL}" || continue
+		mark_finished "${LINE}" "${FILENAME_QUEUE}"
+	else
+		eval ${COMMAND} -x${MAX_CONNECTIONS_PER_SERVER} -s${SPLIT} -k${MIN_SPLIT_SIZE} --continue=${CONTINUE} --load-cookies=${LOAD_COOKIE_PATH} --out=${TITLE} "${TARGET_URL}" || continue
+		mark_finished "${LINE}" "${FILENAME_QUEUE}"
+	fi
+done
