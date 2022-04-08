@@ -94,6 +94,6 @@ shift $(($OPTIND - 1))
 		    TITLE="${JQ_SHARE_TITLE} ${JS_SERIES_TITLE} ${JQ_BROADCASTDATELABEL} ${JQ_TITLE} ${VIDEO_ID}"
 		    echo ${TITLE}
 
-		    eval ${DL_COMMAND} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+		    eval ${DL_COMMAND} --encoding utf-8 --all-subs ${URL} -o '${TITLE}.mp4' || continue
 		    mark_finished "${LINE}" "${FILENAME_QUEUE}"
 		    done
