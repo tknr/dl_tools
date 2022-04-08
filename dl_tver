@@ -1,0 +1,99 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+FILENAME_QUEUE="queue_tver.txt"
+
+usage_exit() {
+	echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+		exit 1
+}
+
+mark_finished(){
+	sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+DL_COMMAND=
+if type "yt-dlp" > /dev/null 2>&1 ; then
+DL_COMMAND="yt-dlp"
+elif type "youtube-dl" > /dev/null 2>&1 ; then
+DL_COMMAND="youtube-dl"
+else
+echo "not installed yt-dlp nor youtube-dl ."
+exit 1
+fi
+
+DL_BASEDIR=`pwd`
+USE_COOKIEFILE=false
+COOKIEFILE=
+source ~/.config/dl_tver/config
+
+if "${USE_COOKIEFILE}"; then
+DL_COMMAND="${DL_COMMAND} --cookies ${COOKIEFILE}"
+fi
+
+mkdir -p ${DL_BASEDIR}
+cd ${DL_BASEDIR}
+
+while getopts q:h OPT
+do
+case $OPT in
+q)  FILENAME_QUEUE=$OPTARG
+;;
+h)  usage_exit
+;;
+\?) usage_exit
+;;
+esac
+done
+
+shift $(($OPTIND - 1))
+
+	echo "reading from "${FILENAME_QUEUE}"..."
+
+	for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+	do
+
+	URL=${LINE}
+
+	echo ${URL}
+
+	if [ ${#URL} -lt 7 ] ; then
+	continue
+	fi
+
+	eval ${DL_COMMAND} --list-formats ${URL} || continue
+	eval ${DL_COMMAND} --list-subs ${URL} || continue
+
+	VIDEO_ID=`echo ${URL} | rev | cut -d "/" -f 1 | rev`
+	JSON=`curl -s https://statics.tver.jp/content/episode/${VIDEO_ID}.json --compressed`
+
+	JQ_TITLE=`echo ${JSON} | jq -r .title`
+	JQ_BROADCASTDATELABEL=`echo ${JSON} | jq -r .broadcastDateLabel`
+	JQ_SHARE_TITLE=`echo ${JSON} | jq -r .share.text | head -n 1`
+	SERIES_ID=`echo ${JSON} | jq -r .seriesID`
+
+	SERIES_JSON=`curl -s https://service-api.tver.jp/api/v1/callSeriesSeasons/${SERIES_ID} \
+		    -H 'authority: service-api.tver.jp' \
+		    -H 'accept: */*' \
+		    -H 'accept-language: ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7' \
+		    -H 'cache-control: no-cache' \
+		    -H 'origin: https://tver.jp' \
+		    -H 'pragma: no-cache' \
+		    -H 'referer: https://tver.jp/' \
+		    -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="100", "Microsoft Edge";v="100"' \
+		    -H 'sec-ch-ua-mobile: ?0' \
+		    -H 'sec-ch-ua-platform: "macOS"' \
+		    -H 'sec-fetch-dest: empty' \
+		    -H 'sec-fetch-mode: cors' \
+		    -H 'sec-fetch-site: same-site' \
+		    -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36 Edg/100.0.1185.36' \
+		    -H 'x-tver-platform-type: web' \
+		    --compressed`
+		    JS_SERIES_TITLE=`echo ${SERIES_JSON} | jq -r '.result | .contents[0] | .content | .title'`
+
+		    TITLE="${JQ_SHARE_TITLE} ${JS_SERIES_TITLE} ${JQ_BROADCASTDATELABEL} ${JQ_TITLE} ${VIDEO_ID}"
+		    echo ${TITLE}
+
+		    eval ${DL_COMMAND} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+		    mark_finished "${LINE}" "${FILENAME_QUEUE}"
+		    done

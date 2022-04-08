@@ -13,7 +13,7 @@ INSTALL_LIST=(
 "dl_streamlink"
 "dl_uptobox"
 "dl_youtube"
-"search_tver"
+"dl_tver"
 )
 
 for INSTALL in ${INSTALL_LIST[@]}
