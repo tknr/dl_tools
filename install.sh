@@ -14,6 +14,7 @@ INSTALL_LIST=(
 "dl_uptobox"
 "dl_youtube"
 "dl_tver"
+"dl_github_release"
 )
 
 for INSTALL in ${INSTALL_LIST[@]}
