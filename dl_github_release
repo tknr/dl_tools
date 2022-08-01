@@ -1,5 +1,5 @@
 #!/bin/bash
-function usage() {
+function usag_exit() {
 	cat <<_EOT_
 Usage:
 `basename $0` [-v|t|h] [base url] [target filename]
@@ -13,6 +13,10 @@ _EOT_
 		exit 1
 }
 
+if [ $# -ne 2 ]; then
+        usage_exit
+fi
+
 VERBOSE=false
 TEST_MODE=false
 
@@ -21,8 +25,8 @@ do
 	case $OPT in
 		t) TEST_MODE=true;;
 		v) VERBOSE=true;;
-		h) usage;;
-		\?) usage;;
+		h) usage_exit;;
+		\?) usage_exit;;
 	esac
 done
 shift $(($OPTIND - 1))
