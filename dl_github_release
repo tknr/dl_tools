@@ -1,5 +1,5 @@
 #!/bin/bash
-function usag_exit() {
+function usage_exit() {
 	cat <<_EOT_
 Usage:
 `basename $0` [-v|t|h] [base url] [target filename]
