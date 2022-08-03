@@ -1,0 +1,45 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+FILENAME_QUEUE="queue_ytmdl.txt"
+
+usage_exit() {
+	echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+	exit 1
+}
+
+mark_finished(){
+	sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+DL_BASEDIR=`pwd`
+source ~/.config/dl_ytmdl/config
+mkdir -p ${DL_BASEDIR}
+cd ${DL_BASEDIR}
+
+while getopts q:h OPT
+do
+case $OPT in
+q)  FILENAME_QUEUE=$OPTARG
+;;
+h)  usage_exit
+;;
+\?) usage_exit
+;;
+esac
+	done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+for URL in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+
+	echo ${URL}
+
+	if [ ${#URL} -lt 7 ] ; then
+		continue
+	fi
+	ytmdl --url ${URL} || continue
+	mark_finished "${URL}" "${FILENAME_QUEUE}"
+done
