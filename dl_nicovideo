@@ -1,7 +1,7 @@
 #!/bin/bash
 export IFS=$'\n'
 CMDNAME=`basename $0`
-FILENAME_QUEUE="queue_ytmdl.txt"
+FILENAME_QUEUE="queue_nicovideo.txt"
 
 usage_exit() {
 	echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
@@ -13,7 +13,7 @@ mark_finished(){
 }
 
 DL_BASEDIR=`pwd`
-source ~/.config/dl_ytmdl/config
+source ~/.config/dl_nicovideo/config
 mkdir -p ${DL_BASEDIR}
 cd ${DL_BASEDIR}
 
@@ -40,6 +40,6 @@ do
 	if [ ${#URL} -lt 7 ] ; then
 		continue
 	fi
-	ytmdl --skip-meta --url ${URL} || continue
+	niconico video "${URL}" download || continue
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
 done
