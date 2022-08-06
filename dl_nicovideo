@@ -16,6 +16,7 @@ DL_BASEDIR=`pwd`
 source ~/.config/dl_nicovideo/config
 mkdir -p ${DL_BASEDIR}
 cd ${DL_BASEDIR}
+echo ${DL_BASEDIR}
 
 while getopts q:h OPT
 do
@@ -40,6 +41,12 @@ do
 	if [ ${#URL} -lt 7 ] ; then
 		continue
 	fi
+	JSON=`niconico video "${URL}" json`
+	ID=`echo ${JSON} | jq .video.id | tr -d '"/'`
+	TITLE=`echo ${JSON} | jq .video.title | tr -d '"/'`
+	OGP=`echo ${JSON} | jq .video.thumbnail.ogp | tr -d '"/'`
 	niconico video "${URL}" download || continue
+	mv -v "${DL_BASEDIR}/${ID}.mp4" "${DL_BASEDIR}/${TITLE}.${ID}.mp4"
+	wget "${OGP}" -O "${DL_BASEDIR}/${TITLE}.${ID}.jpg"
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
 done
