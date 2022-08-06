@@ -42,9 +42,9 @@ do
 		continue
 	fi
 	JSON=`niconico video "${URL}" json`
-	ID=`echo ${JSON} | jq .video.id | tr -d '"/'`
-	TITLE=`echo ${JSON} | jq .video.title | tr -d '"/'`
-	OGP=`echo ${JSON} | jq .video.thumbnail.ogp | tr -d '"/'`
+	ID=`echo ${JSON} | jq .video.id | tr -d '"/' | tr -s ' '`
+	TITLE=`echo ${JSON} | jq .video.title | tr -d '"/' | tr -s ' '`
+	OGP=`echo ${JSON} | jq .video.thumbnail.ogp | tr -d '"/' | tr -s ' '`
 	niconico video "${URL}" download || continue
 	mv -v "${DL_BASEDIR}/${ID}.mp4" "${DL_BASEDIR}/${TITLE}.${ID}.mp4"
 	wget "${OGP}" -O "${DL_BASEDIR}/${TITLE}.${ID}.jpg"
