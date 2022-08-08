@@ -1,7 +1,7 @@
 #!/bin/bash
 export IFS=$'\n'
 CMDNAME=`basename $0`
-FILENAME_QUEUE="queue_freyr.txt"
+FILENAME_QUEUE="queue_uptobox.txt"
 
 usage_exit() {
         echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
@@ -13,8 +13,8 @@ mark_finished(){
 }
 
 BASEDIR=`pwd`
-
-source ~/.config/dl_freyr/config
+MY_USER_TOKEN=''
+source ~/.config/dl_uptobox/config
 
 mkdir -p ${BASEDIR}
 
@@ -36,6 +36,6 @@ echo "reading from "${FILENAME_QUEUE}" ..."
 
 for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
 do
-	freyr "${LINE}" || continue
+	uptobox-dl --token ${MY_USER_TOKEN} --output-directory ${BASEDIR} "${LINE}" || continue
 	mark_finished "${LINE}" "${FILENAME_QUEUE}"
 done
