@@ -13,6 +13,8 @@ mark_finished(){
 }
 
 DL_BASEDIR=`pwd`
+USE_COOKIEFILE=false
+COOKIEFILE=
 source ~/.config/dl_nicovideo/config
 mkdir -p ${DL_BASEDIR}
 cd ${DL_BASEDIR}
@@ -46,7 +48,11 @@ do
 	TITLE=`echo ${JSON} | jq .video.title | tr -d '"/' | tr -s ' '`
 	NICKNAME=`echo ${JSON} | jq .owner.nickname | tr -d '"'`
 	OGP=`echo ${JSON} | jq .video.thumbnail.ogp | tr -d '"'`
-	niconico video "${URL}" download || continue
+	if "${USE_COOKIEFILE}"; then
+		niconico --cookies ${COOKIEFILE} video "${URL}" download || continue
+	else
+		niconico video "${URL}" download || continue
+	fi
 	mv -v "${DL_BASEDIR}/${ID}.mp4" "${DL_BASEDIR}/${NICKNAME} - ${TITLE} - ${ID}.mp4"
 	wget -v "${OGP}" -O "${DL_BASEDIR}/${NICKNAME} - ${TITLE} - ${ID}.jpg"
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
