@@ -1,4 +1,7 @@
 #!/bin/bash
+
+## https://github.com/Aerion/uptobox-dl
+
 export IFS=$'\n'
 CMDNAME=`basename $0`
 FILENAME_QUEUE="queue_uptobox.txt"
