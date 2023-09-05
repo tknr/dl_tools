@@ -40,6 +40,6 @@ do
 	if [ ${#URL} -lt 7 ] ; then
 		continue
 	fi
-	ytmdl --skip-meta --url ${URL} || continue
+	yt-dlp -x --audio-format mp3 --embed-thumbnail ${URL} || continue
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
 done
