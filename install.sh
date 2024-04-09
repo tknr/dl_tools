@@ -16,7 +16,6 @@ INSTALL_LIST=(
 "dl_tver"
 "dl_github_release"
 "dl_ytmdl"
-"dl_nicovideo"
 )
 
 for INSTALL in ${INSTALL_LIST[@]}
