@@ -12,19 +12,16 @@ mark_finished(){
         sed -i -e "s|${1}|#${1}|g" ${2}
 }
 
-DL_COMMAND=
-if type "yt-dlp" > /dev/null 2>&1 ; then
-	DL_COMMAND="yt-dlp"
-elif type "youtube-dl" > /dev/null 2>&1 ; then
-	DL_COMMAND="youtube-dl"
-else
-	echo "not installed yt-dlp nor youtube-dl ."
+if ! command -v yt-dlp 2>&1 >/dev/null
+then
+	echo "not installed yt-dlp ."
 	exit 1
 fi
 
 DL_BASEDIR=`pwd`
 USE_COOKIEFILE=false
 COOKIEFILE=
+FILENAME_FORMAT="%(title).150B %(id)s.%(ext)s"
 source ~/.config/dl_youtube/config
 mkdir -p ${DL_BASEDIR}
 cd ${DL_BASEDIR}
@@ -69,23 +66,23 @@ do
 
 
 	if "${USE_COOKIEFILE}"; then
-                eval ${DL_COMMAND} --cookies ${COOKIEFILE} --list-formats ${URL} || continue
-                eval ${DL_COMMAND} --cookies ${COOKIEFILE} --list-subs ${URL} || continue
+                yt-dlp --cookies ${COOKIEFILE} --list-formats ${URL} || continue
+                yt-dlp --cookies ${COOKIEFILE} --list-subs ${URL} || continue
                 if [ ${#TITLE} = 0 ] ; then
-                        eval ${DL_COMMAND} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} || continue
+                        yt-dlp --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
                         mark_finished "${LINE}" "${FILENAME_QUEUE}"
                 else
-                        eval ${DL_COMMAND} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                        yt-dlp --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
                         mark_finished "${LINE}" "${FILENAME_QUEUE}"
                 fi
 	else
-        	eval ${DL_COMMAND} --list-formats ${URL} || continue
-        	eval ${DL_COMMAND} --list-subs ${URL} || continue
+        	yt-dlp --list-formats ${URL} || continue
+        	yt-dlp --list-subs ${URL} || continue
 		if [ ${#TITLE} = 0 ] ; then
-			eval ${DL_COMMAND} --encoding utf-8 --all-subs ${URL} || continue
+			yt-dlp --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
 			mark_finished "${LINE}" "${FILENAME_QUEUE}"
 		else
-			eval ${DL_COMMAND} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+			yt-dlp --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
 			mark_finished "${LINE}" "${FILENAME_QUEUE}"
 		fi
 	fi
