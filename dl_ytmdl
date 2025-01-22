@@ -13,6 +13,8 @@ mark_finished(){
 }
 
 DL_BASEDIR=`pwd`
+USE_COOKIEFILE=false
+COOKIEFILE=
 source ~/.config/dl_ytmdl/config
 mkdir -p ${DL_BASEDIR}
 cd ${DL_BASEDIR}
@@ -40,6 +42,6 @@ do
 	if [ ${#URL} -lt 7 ] ; then
 		continue
 	fi
-	yt-dlp -x --audio-format mp3 --embed-thumbnail ${URL} || continue
+	yt-dlp -x --audio-format mp3 --embed-thumbnail --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue	
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
 done
