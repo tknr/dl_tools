@@ -59,25 +59,43 @@ do
                 continue
         fi
 
-	if "${USE_COOKIEFILE}"; then
-                yt-dlp --cookies ${COOKIEFILE} --list-formats --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
-                yt-dlp --cookies ${COOKIEFILE} --list-subs --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
-                if [ ${#TITLE} = 0 ] ; then
-                        yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
-                        mark_finished "${LINE}" "${FILENAME_QUEUE}"
-                else
-                        yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
-                        mark_finished "${LINE}" "${FILENAME_QUEUE}"
-                fi
-	else
-        	yt-dlp --list-formats --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
-        	yt-dlp --list-subs --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
-		if [ ${#TITLE} = 0 ] ; then
-			yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
-			mark_finished "${LINE}" "${FILENAME_QUEUE}"
-		else
-			yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
-			mark_finished "${LINE}" "${FILENAME_QUEUE}"
-		fi
-	fi
+        if [[ "$string" == *"youtube"* ]]; then
+        	if "${USE_COOKIEFILE}"; then
+                        # yt-dlp --cookies ${COOKIEFILE} --list-formats --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
+                        # yt-dlp --cookies ${COOKIEFILE} --list-subs --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
+                        if [ ${#TITLE} = 0 ] ; then
+                                yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+                        else
+                                yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                        fi
+	        else
+        	        # yt-dlp --list-formats --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
+        	        # yt-dlp --list-subs --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
+		        if [ ${#TITLE} = 0 ] ; then
+			        yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+		        else
+			        yt-dlp --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+		        fi
+	        fi
+        else
+        	if "${USE_COOKIEFILE}"; then
+                        # yt-dlp --cookies ${COOKIEFILE} --list-formats ${URL} || continue
+                        # yt-dlp --cookies ${COOKIEFILE} --list-subs ${URL} || continue
+                        if [ ${#TITLE} = 0 ] ; then
+                                yt-dlp --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+                        else
+                                yt-dlp --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                        fi
+	        else
+        	        # yt-dlp --list-formats ${URL} || continue
+        	        # yt-dlp --list-subs || continue
+		        if [ ${#TITLE} = 0 ] ; then
+			        yt-dlp --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+		        else
+			        yt-dlp --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+		        fi
+	        fi
+        fi
+
+        mark_finished "${LINE}" "${FILENAME_QUEUE}"
 done
