@@ -42,6 +42,10 @@ do
 	if [ ${#URL} -lt 7 ] ; then
 		continue
 	fi
-	yt-dlp -x --audio-format mp3 --embed-thumbnail --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue	
+	if [[ "$URL" == *"youtube"* ]]; then
+		yt-dlp -x --audio-format mp3 --embed-thumbnail --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue	
+	else
+		yt-dlp -x --audio-format mp3 --embed-thumbnail ${URL} || continue	
+	fi
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
 done

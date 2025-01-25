@@ -59,7 +59,7 @@ do
                 continue
         fi
 
-        if [[ "$string" == *"youtube"* ]]; then
+        if [[ "$URL" == *"youtube"* ]]; then
         	if "${USE_COOKIEFILE}"; then
                         # yt-dlp --cookies ${COOKIEFILE} --list-formats --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
                         # yt-dlp --cookies ${COOKIEFILE} --list-subs --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue
