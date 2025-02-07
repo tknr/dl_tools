@@ -13,7 +13,7 @@ mark_finished(){
 }
 
 BC_BASEDIR=`pwd`
-#BC_TEMPLATE="%{label}/%{artist} - %{album} - %{date}/%{track} - %{artist} - %{title}"
+BC_TEMPLATE="%{label}/%{date} - %{artist} - %{album}/%{track} - %{trackartist} - %{title}"
 BC_OUTPUT="{artist}/{year} - {album}/{track_num:02d} - {artist} - {track}.{ext}"
 BC_OUTPUT_EXTRA="{artist}/{year} - {album}/{filename}"
 
@@ -38,6 +38,7 @@ echo "reading from "${FILENAME_QUEUE}"..."
 
 for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
 do
-	bandcamper -o ${BC_OUTPUT} --fallback --output-extra ${BC_OUTPUT_EXTRA} -d ${BC_BASEDIR} "${LINE}" || continue
+	#bandcamper -o ${BC_OUTPUT} --fallback --output-extra ${BC_OUTPUT_EXTRA} -d ${BC_BASEDIR} "${LINE}" || continue
+	yes | bandcamp-dl -d -o -r -g -e -k -u --base-dir=${BC_BASEDIR} --template=$BC_TEMPLATE "${LINE}" || continue
 	mark_finished "${LINE}" "${FILENAME_QUEUE}"
 done
