@@ -1,0 +1,61 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+FILENAME_QUEUE="queue_abema.txt"
+
+usage_exit() {
+    echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+    exit 1
+}
+
+mark_finished(){
+    sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+if ! command -v pup 2>&1 >/dev/null
+then
+	echo "not installed pup ."
+	exit 1
+fi
+if ! command -v streamlink 2>&1 >/dev/null
+then
+	echo "not installed streamlink ."
+	exit 1
+fi
+
+TMP_HTML=/tmp/abema.html
+DL_BASEDIR=`pwd`
+source ~/.config/dl_abema/config
+mkdir -p ${DL_BASEDIR}
+cd ${DL_BASEDIR}
+
+while getopts q:h OPT
+do
+    case $OPT in
+        q)  FILENAME_QUEUE=$OPTARG
+            ;;
+        h)  usage_exit
+            ;;
+        \?) usage_exit
+            ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+    URL=${LINE}
+    curl -s "${URL}" > ${TMP_HTML} || continue
+    TITLE=`cat ${TMP_HTML} | pup "title text{}" | cut -d "|" -f 1`
+    SUPPLEMENT=`cat ${TMP_HTML} | pup ".com-video-EpisodeTitleBlock__supplement text{}" | sed -z 's/\n/ /g'`
+    #SYNOPSYS=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__content text{}"`
+    #COPYRIGHT=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__copyright text{}"`
+    FILENAME="${TITLE} ${SUPPLEMENT}"
+    streamlink "${URL}" "best" -o "/tmp/${FILENAME}.ts" || continue
+    ffmpeg -hide_banner -y -i "/tmp/${FILENAME}.ts" -movflags +faststart -codec:v libx264 -preset:v veryfast -acodec aac -b:a 192k -aac_coder twoloop "${FILENAME}.mp4" || continue
+    /bin/rm -f "/tmp/${FILENAME}.ts"
+    /bin/rm -f ${TMP_HTML}
+    mark_finished "${LINE}" "${FILENAME_QUEUE}"
+done
