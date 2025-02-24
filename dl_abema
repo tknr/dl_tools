@@ -53,7 +53,7 @@ do
     #SYNOPSYS=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__content text{}"`
     #COPYRIGHT=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__copyright text{}"`
     FILENAME="${TITLE} ${SUPPLEMENT}"
-    streamlink "${URL}" "best" -o "/tmp/${FILENAME}.ts" || continue
+    streamlink "${URL}" "best" -o "/tmp/${FILENAME}.ts" -f --progress force || continue
     ffmpeg -hide_banner -y -i "/tmp/${FILENAME}.ts" -movflags +faststart -codec:v libx264 -preset:v veryfast -acodec aac -b:a 192k -aac_coder twoloop "${FILENAME}.mp4" || continue
     /bin/rm -f "/tmp/${FILENAME}.ts"
     /bin/rm -f ${TMP_HTML}
