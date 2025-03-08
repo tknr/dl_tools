@@ -48,7 +48,7 @@ for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
 do
     URL=${LINE}
     curl -s "${URL}" > ${TMP_HTML} || continue
-    TITLE=`cat ${TMP_HTML} | pup "title text{}" | cut -d "|" -f 1`
+    TITLE=`cat ${TMP_HTML} | pup "title text{}" | cut -d "|" -f 1 | sed -e "s|/|_|g"`
     SUPPLEMENT=`cat ${TMP_HTML} | pup ".com-video-EpisodeTitleBlock__supplement text{}" | sed -z 's/\n/ /g' | sed -e 's/^ //g' | sed -e 's/ $//g'`
     #SYNOPSYS=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__content text{}"`
     #COPYRIGHT=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__copyright text{}"`
