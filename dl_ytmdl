@@ -43,7 +43,10 @@ do
 		continue
 	fi
 	if [[ "$URL" == *"youtube"* ]]; then
-		yt-dlp -x --audio-format mp3 --embed-thumbnail --sleep-requests $((RANDOM % 10 + 1))  --min-sleep-interval $((RANDOM % 30 + 30))  --max-sleep-interval $((RANDOM % 60 + 30)) ${URL} || continue	
+		SLEEP_REQUESTS=$((RANDOM % 10 + 1))
+                MIN_SLEEP_INTERNAL=$((RANDOM % 30 + 30))
+                MAX_SLEEP_INTERNAL=$((MIN_SLEEP_INTERNAL + 30))
+		yt-dlp -x --audio-format mp3 --embed-thumbnail --sleep-requests ${SLEEP_REQUESTS} --min-sleep-interval ${MIN_SLEEP_INTERNAL=$} --max-sleep-interval ${MAX_SLEEP_INTERNAL} ${URL} || continue	
 	else
 		yt-dlp -x --audio-format mp3 --embed-thumbnail ${URL} || continue	
 	fi
