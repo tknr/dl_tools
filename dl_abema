@@ -23,7 +23,8 @@ then
 	exit 1
 fi
 
-TMP_HTML=/tmp/abema.html
+UUID=`uuidgen`
+TMP_HTML=/tmp/abema${UUID}.html
 DL_BASEDIR=`pwd`
 source ~/.config/dl_abema/config
 mkdir -p ${DL_BASEDIR}
