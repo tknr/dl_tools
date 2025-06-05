@@ -60,20 +60,17 @@ do
         fi
 
         if [[ "$URL" == *"youtube"* ]]; then
-		SLEEP_REQUESTS=$((RANDOM % 10 + 1))
-		MIN_SLEEP_INTERNAL=$((RANDOM % 10 + 10))
-		MAX_SLEEP_INTERNAL=$((MIN_SLEEP_INTERNAL + 10))
         	if "${USE_COOKIEFILE}"; then
                         if [ ${#TITLE} = 0 ] ; then
-                                yt-dlp --sleep-requests ${SLEEP_REQUESTS} --min-sleep-interval ${MIN_SLEEP_INTERNAL} --max-sleep-interval ${MAX_SLEEP_INTERNAL} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+                                yt-dlp -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
                         else
-                                yt-dlp --sleep-requests ${SLEEP_REQUESTS} --min-sleep-interval ${MIN_SLEEP_INTERNAL} --max-sleep-interval ${MAX_SLEEP_INTERNAL} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                                yt-dlp -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
                         fi
 	        else
 		        if [ ${#TITLE} = 0 ] ; then
-			        yt-dlp --sleep-requests ${SLEEP_REQUESTS} --min-sleep-interval ${MIN_SLEEP_INTERNAL} --max-sleep-interval ${MAX_SLEEP_INTERNAL} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+			        yt-dlp -t sleep --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
 		        else
-			        yt-dlp --sleep-requests ${SLEEP_REQUESTS} --min-sleep-interval ${MIN_SLEEP_INTERNAL} --max-sleep-interval ${MAX_SLEEP_INTERNAL} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+			        yt-dlp -t sleep --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
 		        fi
 	        fi
         else
