@@ -3,7 +3,7 @@ export IFS=$'\n'
 CMDNAME=`basename $0`
 
 FILENAME_QUEUE="queue_aria2c.txt"
-COMMAND="time aria2c"
+DLDIR=~/Downloads
 MAX_CONNECTIONS_PER_SERVER=5
 SPLIT=5
 MIN_SPLIT_SIZE="20M"
@@ -61,10 +61,10 @@ do
 	TARGET_URL=`curl -I -Ls -o /dev/null -w %{url_effective} "${URL}"`
 
 	if [ ${#TITLE} = 0 ] ; then
-		eval ${COMMAND} -x${MAX_CONNECTIONS_PER_SERVER} -s${SPLIT} -k${MIN_SPLIT_SIZE} --continue=${CONTINUE} --force-sequential=${FORCE_SEQUENTIAL} --load-cookies=${LOAD_COOKIE_PATH} "${TARGET_URL}" || continue
+		aria2c --dir=${DLDIR} -x${MAX_CONNECTIONS_PER_SERVER} -s${SPLIT} -k${MIN_SPLIT_SIZE} --continue=${CONTINUE} --force-sequential=${FORCE_SEQUENTIAL} --load-cookies=${LOAD_COOKIE_PATH} "${TARGET_URL}" || continue
 		mark_finished "${LINE}" "${FILENAME_QUEUE}"
 	else
-		eval ${COMMAND} -x${MAX_CONNECTIONS_PER_SERVER} -s${SPLIT} -k${MIN_SPLIT_SIZE} --continue=${CONTINUE} --load-cookies=${LOAD_COOKIE_PATH} --out=${TITLE} "${TARGET_URL}" || continue
+		aria2c --dir=${DLDIR} -x${MAX_CONNECTIONS_PER_SERVER} -s${SPLIT} -k${MIN_SPLIT_SIZE} --continue=${CONTINUE} --load-cookies=${LOAD_COOKIE_PATH} --out=${TITLE} "${TARGET_URL}" || continue
 		mark_finished "${LINE}" "${FILENAME_QUEUE}"
 	fi
 done
