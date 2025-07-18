@@ -55,7 +55,7 @@ do
     #COPYRIGHT=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__copyright text{}"`
     FILENAME="${TITLE} ${SUPPLEMENT}"
     streamlink "${URL}" "best" -o "/tmp/${FILENAME}.ts" -f --progress force || continue
-    ffmpeg -hide_banner -y -i "/tmp/${FILENAME}.ts" -movflags +faststart -codec:v libx264 -preset:v veryfast -acodec aac -b:a 192k -aac_coder twoloop "${DL_BASEDIR}/${FILENAME}.mp4" || continue
+    ffmpeg -hide_banner -y -i "/tmp/${FILENAME}.ts" -movflags +faststart -codec:v libx265 -preset:v veryfast -acodec aac -b:a 192k -aac_coder twoloop "${DL_BASEDIR}/${FILENAME}.mp4" || continue
     /bin/rm -f "/tmp/${FILENAME}.ts"
     /bin/rm -f "${TMP_HTML}"
     mark_finished "${LINE}" "${FILENAME_QUEUE}"
