@@ -49,13 +49,13 @@ for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
 do
     URL=${LINE}
     curl -s "${URL}" > ${TMP_HTML} || continue
-    TITLE=`cat ${TMP_HTML} | pup "title text{}" | cut -d "|" -f 1 | sed -e "s|/|_|g"`
+    TITLE=`cat ${TMP_HTML} | pup "title text{}" | nkf -Z | sed -e "s/　/ /g" | cut -d "|" -f 1 | sed -e "s|/|_|g" | rev | cut -d "-" -f 1 | rev | sed -e "s/^ //g"`
     SUPPLEMENT=`cat ${TMP_HTML} | pup ".com-video-EpisodeTitleBlock__supplement text{}" | sed -z 's/\n/ /g' | sed -e 's/^ //g' | sed -e 's/ $//g'`
     #SYNOPSYS=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__content text{}"`
     #COPYRIGHT=`cat ${TMP_HTML} | pup ".com-video-EpisodeDetailsBlock__copyright text{}"`
     FILENAME="${TITLE} ${SUPPLEMENT}"
     streamlink "${URL}" "best" -o "/tmp/${FILENAME}.ts" -f --progress force || continue
-    ffmpeg -hide_banner -y -i "/tmp/${FILENAME}.ts" -movflags +faststart -codec:v libx265 -preset:v veryfast -acodec aac -b:a 192k -aac_coder twoloop "${DL_BASEDIR}/${FILENAME}.mp4" || continue
+    ffmpeg -hide_banner -y -i "/tmp/${FILENAME}.ts" -movflags +faststart -codec:v h264_qsv -preset:v veryfast -acodec aac -b:a 192k -aac_coder twoloop "${DL_BASEDIR}/${FILENAME}.mp4" || continue
     /bin/rm -f "/tmp/${FILENAME}.ts"
     /bin/rm -f "${TMP_HTML}"
     mark_finished "${LINE}" "${FILENAME_QUEUE}"
