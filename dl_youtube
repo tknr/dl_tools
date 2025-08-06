@@ -18,6 +18,7 @@ then
 	exit 1
 fi
 
+FFMPEG=`which ffmpeg`
 DL_BASEDIR=`pwd`
 USE_COOKIEFILE=false
 COOKIEFILE=
@@ -62,33 +63,29 @@ do
         if [[ "$URL" == *"youtube"* ]]; then
         	if "${USE_COOKIEFILE}"; then
                         if [ ${#TITLE} = 0 ] ; then
-                                yt-dlp -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
                         else
-                                yt-dlp -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
                         fi
 	        else
 		        if [ ${#TITLE} = 0 ] ; then
-			        yt-dlp -t sleep --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
 		        else
-			        yt-dlp -t sleep --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
 		        fi
 	        fi
         else
         	if "${USE_COOKIEFILE}"; then
-                        # yt-dlp --cookies ${COOKIEFILE} --list-formats ${URL} || continue
-                        # yt-dlp --cookies ${COOKIEFILE} --list-subs ${URL} || continue
                         if [ ${#TITLE} = 0 ] ; then
-                                yt-dlp --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
                         else
-                                yt-dlp --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
                         fi
 	        else
-        	        # yt-dlp --list-formats ${URL} || continue
-        	        # yt-dlp --list-subs || continue
 		        if [ ${#TITLE} = 0 ] ; then
-			        yt-dlp --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
 		        else
-			        yt-dlp --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
 		        fi
 	        fi
         fi
