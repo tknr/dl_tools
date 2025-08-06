@@ -12,6 +12,7 @@ mark_finished(){
 	sed -i -e "s|${1}|#${1}|g" ${2}
 }
 
+FFMPEG=`which ffmpeg`
 DL_BASEDIR=`pwd`
 USE_COOKIEFILE=false
 COOKIEFILE=
@@ -43,12 +44,17 @@ do
 		continue
 	fi
 	if [[ "$URL" == *"youtube"* ]]; then
-		SLEEP_REQUESTS=$((RANDOM % 10 + 1))
-                MIN_SLEEP_INTERNAL=$((RANDOM % 30 + 30))
-                MAX_SLEEP_INTERNAL=$((MIN_SLEEP_INTERNAL + 30))
-		yt-dlp -x --audio-format mp3 --embed-thumbnail --sleep-requests ${SLEEP_REQUESTS} --min-sleep-interval ${MIN_SLEEP_INTERNAL=$} --max-sleep-interval ${MAX_SLEEP_INTERNAL} ${URL} || continue	
+        	if "${USE_COOKIEFILE}"; then
+        		yt-dlp --ffmpeg-location ${FFMPEG}  -t sleep --audio-format mp3 --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
+		else
+			yt-dlp --ffmpeg-location ${FFMPEG}  -t sleep --audio-format mp3 --embed-thumbnail ${URL} || continue                
+		fi
 	else
-		yt-dlp -x --audio-format mp3 --embed-thumbnail ${URL} || continue	
+                if "${USE_COOKIEFILE}"; then
+                        yt-dlp --ffmpeg-location ${FFMPEG} --audio-format mp3 --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
+                else
+                        yt-dlp --ffmpeg-location ${FFMPEG} --audio-format mp3 --embed-thumbnail ${URL} || continue
+                fi
 	fi
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
 done
