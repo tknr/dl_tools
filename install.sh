@@ -6,6 +6,7 @@ INSTALL_LIST=(
 "dl_abema"
 "dl_aria2c"
 "dl_bc"
+"dl_bandcamper"
 "dl_curl"
 "dl_freyr"
 "dl_github_release"

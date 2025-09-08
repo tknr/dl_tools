@@ -1,0 +1,44 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+FILENAME_QUEUE="queue_bc.txt"
+
+usage_exit() {
+        echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+        exit 1
+}
+
+mark_finished(){
+        sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+BC_BASEDIR=`pwd`
+BC_TEMPLATE="%{label}/%{date} - %{artist} - %{album}/%{track} - %{trackartist} - %{title}"
+BC_OUTPUT="{artist}/{year} - {album}/{track_num:02d} - {artist} - {track}.{ext}"
+BC_OUTPUT_EXTRA="{artist}/{year} - {album}/{filename}"
+FORMAT=mp3-320
+
+source ~/.config/dl_bandcamper/config
+
+mkdir -p ${BC_BASEDIR}
+
+while getopts q:h OPT
+do
+    case $OPT in
+        q)  FILENAME_QUEUE=$OPTARG
+            ;;
+        h)  usage_exit
+            ;;
+        \?) usage_exit
+            ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+	bandcamper -o ${BC_OUTPUT} --output-extra ${BC_OUTPUT_EXTRA} -d ${BC_BASEDIR} -f ${FORMAT} --fallback "${LINE}" || continue
+	mark_finished "${LINE}" "${FILENAME_QUEUE}"
+done
