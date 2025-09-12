@@ -45,15 +45,15 @@ do
 	fi
 	if [[ "$URL" == *"youtube"* ]]; then
         	if "${USE_COOKIEFILE}"; then
-        		yt-dlp -x --ffmpeg-location ${FFMPEG}  -t sleep --audio-format mp3 --audio-quality 0 -b 320k --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
+        		yt-dlp -x --ffmpeg-location ${FFMPEG}  -t sleep --audio-format mp3 --audio-quality 320k --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
 		else
-			yt-dlp -x --ffmpeg-location ${FFMPEG}  -t sleep --audio-format mp3 --audio-quality 0 -b 320k --embed-thumbnail ${URL}  || continue                
+			yt-dlp -x --ffmpeg-location ${FFMPEG}  -t sleep --audio-format mp3 --audio-quality 320k --embed-thumbnail ${URL}  || continue                
 		fi
 	else
                 if "${USE_COOKIEFILE}"; then
-                        yt-dlp -x --ffmpeg-location ${FFMPEG} --audio-format mp3 --audio-quality 0 -b 320k --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
+                        yt-dlp -x --ffmpeg-location ${FFMPEG} --audio-format mp3 --audio-quality 320k --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
                 else
-                        yt-dlp -x --ffmpeg-location ${FFMPEG} --audio-format mp3 --audio-quality 0 -b 320k --embed-thumbnail ${URL} || continue
+                        yt-dlp -x --ffmpeg-location ${FFMPEG} --audio-format mp3 --audio-quality 320k --embed-thumbnail ${URL} || continue
                 fi
 	fi
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
