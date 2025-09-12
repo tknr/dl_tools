@@ -39,6 +39,6 @@ echo "reading from "${FILENAME_QUEUE}"..."
 
 for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
 do
-	bandcamper -o ${BC_OUTPUT} --output-extra ${BC_OUTPUT_EXTRA} -d ${BC_BASEDIR} -f ${FORMAT} --fallback "${LINE}" || continue
+	bandcamper -o ${BC_OUTPUT} --output-extra ${BC_OUTPUT_EXTRA} -d ${BC_BASEDIR} -f ${FORMAT} "${LINE}" || continue
 	mark_finished "${LINE}" "${FILENAME_QUEUE}"
 done
