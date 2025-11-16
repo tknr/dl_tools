@@ -63,29 +63,29 @@ do
         if [[ "$URL" == *"youtube"* ]]; then
         	if "${USE_COOKIEFILE}"; then
                         if [ ${#TITLE} = 0 ] ; then
-                                yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start -o ${FILENAME_FORMAT} ${URL} || continue
                         else
-                                yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --cookies ${COOKIEFILE} --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start ${URL} -o ${TITLE}.mp4 || continue
                         fi
 	        else
 		        if [ ${#TITLE} = 0 ] ; then
-			        yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start -o ${FILENAME_FORMAT} ${URL} || continue
 		        else
-			        yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} -t sleep --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start ${URL} -o ${TITLE}.mp4 || continue
 		        fi
 	        fi
         else
         	if "${USE_COOKIEFILE}"; then
                         if [ ${#TITLE} = 0 ] ; then
-                                yt-dlp --ffmpeg-location ${FFMPEG} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} --cookies ${COOKIEFILE} --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start -o ${FILENAME_FORMAT} ${URL} || continue
                         else
-                                yt-dlp --ffmpeg-location ${FFMPEG} --cookies ${COOKIEFILE} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+                                yt-dlp --ffmpeg-location ${FFMPEG} --cookies ${COOKIEFILE} --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start ${URL} -o ${TITLE}.mp4 || continue
                         fi
 	        else
 		        if [ ${#TITLE} = 0 ] ; then
-			        yt-dlp --ffmpeg-location ${FFMPEG} --encoding utf-8 --all-subs -o ${FILENAME_FORMAT} ${URL} || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start -o ${FILENAME_FORMAT} ${URL} || continue
 		        else
-			        yt-dlp --ffmpeg-location ${FFMPEG} --encoding utf-8 --all-subs ${URL} -o ${TITLE}.mp4 || continue
+			        yt-dlp --ffmpeg-location ${FFMPEG} --encoding utf-8 --js-runtimes node --all-subs --compat-options no-live-chat --live-from-start ${URL} -o ${TITLE}.mp4 || continue
 		        fi
 	        fi
         fi
