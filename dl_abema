@@ -1,7 +1,13 @@
 #!/bin/bash
 export IFS=$'\n'
 CMDNAME=`basename $0`
-FILENAME_QUEUE="queue_abema.txt"
+
+## https://qiita.com/hit/items/e95298f689a1ee70ae4a
+_pcnt=`pgrep -fo ${CMDNAME} | wc -l`
+if [ ${_pcnt} -gt 1 ]; then
+        echo "This script has been running now. proc : ${_pcnt}"
+  exit 1
+fi
 
 usage_exit() {
     echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
@@ -24,6 +30,7 @@ then
 fi
 
 UUID=`uuidgen`
+FILENAME_QUEUE="queue_abema.txt"
 TMP_HTML=/tmp/abema${UUID}.html
 DL_BASEDIR=`pwd`
 source ~/.config/dl_abema/config
