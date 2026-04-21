@@ -1,6 +1,14 @@
 #!/bin/bash
 export IFS=$'\n'
 CMDNAME=`basename $0`
+
+## https://qiita.com/hit/items/e95298f689a1ee70ae4a
+_pcnt=`pgrep -fo ${CMDNAME} | wc -l`
+if [ ${_pcnt} -gt 1 ]; then
+        echo "This script has been running now. proc : ${_pcnt}"
+  exit 1
+fi
+
 FILENAME_QUEUE="queue_bc.txt"
 
 usage_exit() {

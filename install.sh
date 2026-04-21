@@ -20,7 +20,7 @@ INSTALL_LIST=(
 
 for INSTALL in ${INSTALL_LIST[@]}
 do
-	rm /usr/local/bin/${INSTALL}
+	rm -f /usr/local/bin/${INSTALL}
 	ln -s `pwd`/${INSTALL} /usr/local/bin/ || continue
 	ls -lh `which ${INSTALL}`
 done

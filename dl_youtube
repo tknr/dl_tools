@@ -1,4 +1,18 @@
 #!/bin/bash
+
+## https://qiita.com/hit/items/e95298f689a1ee70ae4a
+_pcnt=`pgrep -fo ${CMDNAME} | wc -l`
+if [ ${_pcnt} -gt 1 ]; then
+        echo "This script has been running now. proc : ${_pcnt}"
+  exit 1
+fi
+
+if ! command -v yt-dlp 2>&1 >/dev/null
+then
+        echo "not installed yt-dlp : go https://github.com/yt-dlp/yt-dlp . "
+        exit 1
+fi
+
 export IFS=$'\n'
 CMDNAME=`basename $0`
 FILENAME_QUEUE="queue_youtube.txt"
@@ -12,11 +26,6 @@ mark_finished(){
         sed -i -e "s|${1}|#${1}|g" ${2}
 }
 
-if ! command -v yt-dlp 2>&1 >/dev/null
-then
-	echo "not installed yt-dlp ."
-	exit 1
-fi
 
 FFMPEG=`which ffmpeg`
 DL_BASEDIR=`pwd`

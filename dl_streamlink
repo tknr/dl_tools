@@ -1,5 +1,18 @@
 #!/bin/bash
-pip install -qqq -U streamlink || exit 1
+
+## https://qiita.com/hit/items/e95298f689a1ee70ae4a
+_pcnt=`pgrep -fo ${CMDNAME} | wc -l`
+if [ ${_pcnt} -gt 1 ]; then
+        echo "This script has been running now. proc : ${_pcnt}"
+  exit 1
+fi
+
+if ! command -v streamlink 2>&1 >/dev/null
+then
+        echo "not installed streamlink : go https://github.com/streamlink/streamlink . "
+        exit 1
+fi
+
 export IFS=$'\n'
 CMDNAME=`basename $0`
 FILENAME_QUEUE="queue_streamlink.txt"
