@@ -1,0 +1,44 @@
+#!/bin/bash
+export IFS=$'\n'
+CMDNAME=`basename $0`
+
+## https://qiita.com/hit/items/e95298f689a1ee70ae4a
+_pcnt=`pgrep -fo ${CMDNAME} | wc -l`
+if [ ${_pcnt} -gt 1 ]; then
+        echo "This script has been running now. proc : ${_pcnt}"
+  exit 1
+fi
+
+FILENAME_QUEUE="queue_gam.txt"
+
+usage_exit() {
+        echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+        exit 1
+}
+
+mark_finished(){
+        sed -i -e "s|${1}|#${1}|g" ${2}
+}
+
+source ~/.config/dl_gam/config
+
+while getopts q:h OPT
+do
+    case $OPT in
+        q)  FILENAME_QUEUE=$OPTARG
+            ;;
+        h)  usage_exit
+            ;;
+        \?) usage_exit
+            ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+echo "reading from "${FILENAME_QUEUE}"..."
+
+for LINE in `cat ${FILENAME_QUEUE} | grep -v "^#"`
+do
+	gamdl "${LINE}" || continue
+	mark_finished "${LINE}" "${FILENAME_QUEUE}"
+done

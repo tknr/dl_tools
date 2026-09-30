@@ -9,6 +9,7 @@ INSTALL_LIST=(
 "dl_bandcamper"
 "dl_curl"
 "dl_freyr"
+"dl_gam"
 "dl_github_release"
 "dl_mega"
 "dl_sc"
