@@ -3,14 +3,14 @@
 ## https://qiita.com/hit/items/e95298f689a1ee70ae4a
 _pcnt=`pgrep -fo ${CMDNAME} | wc -l`
 if [ ${_pcnt} -gt 1 ]; then
-        echo "This script has been running now. proc : ${_pcnt}"
-  exit 1
+	echo "This script has been running now. proc : ${_pcnt}"
+	exit 1
 fi
 
 if ! command -v yt-dlp 2>&1 >/dev/null
 then
-        echo "not installed yt-dlp : go https://github.com/yt-dlp/yt-dlp . "
-        exit 1
+	echo "not installed yt-dlp : go https://github.com/yt-dlp/yt-dlp . "
+	exit 1
 fi
 
 export IFS=$'\n'
@@ -18,7 +18,7 @@ CMDNAME=`basename $0`
 FILENAME_QUEUE="queue_ytmdl.txt"
 
 usage_exit() {
-	echo "Usage: ${CMDNAME} [-q queue_filename]" 1>&2
+	echo "Usage: ${CMDNAME} [-h] [-s] [-q queue_filename]" 1>&2
 	exit 1
 }
 
@@ -26,6 +26,7 @@ mark_finished(){
 	sed -i -e "s|${1}|#${1}|g" ${2}
 }
 
+SPLIT_CHAPTERS=false
 FFMPEG=`which ffmpeg`
 DL_BASEDIR=`pwd`
 USE_COOKIEFILE=false
@@ -34,17 +35,19 @@ source ~/.config/dl_ytmdl/config
 mkdir -p ${DL_BASEDIR}
 cd ${DL_BASEDIR}
 
-while getopts q:h OPT
+while getopts q:sh OPT
 do
-case $OPT in
-q)  FILENAME_QUEUE=$OPTARG
-;;
-h)  usage_exit
-;;
-\?) usage_exit
-;;
-esac
-	done
+	case $OPT in
+		q)  FILENAME_QUEUE=$OPTARG
+			;;
+		s)  SPLIT_CHAPTERS=true
+			;;
+		h)  usage_exit
+			;;
+		\?) usage_exit
+			;;
+	esac
+done
 shift $(($OPTIND - 1))
 
 echo "reading from "${FILENAME_QUEUE}"..."
@@ -57,18 +60,18 @@ do
 	if [ ${#URL} -lt 7 ] ; then
 		continue
 	fi
-	if [[ "$URL" == *"youtube"* ]]; then
-        	if "${USE_COOKIEFILE}"; then
-        		yt-dlp -x --ffmpeg-location ${FFMPEG}  -t sleep  --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
+	if [ "${USE_COOKIEFILE}" ]; then
+		if [ "${SPLIT_CHAPTERS}" ]; then
+			yt-dlp -x --ffmpeg-location ${FFMPEG} -t sleep --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail --cookies ${COOKIEFILE} "${URL}" --split-chapters --force-keyframes-at-cuts || continue
 		else
-			yt-dlp -x --ffmpeg-location ${FFMPEG}  -t sleep  --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail ${URL}  || continue                
+			yt-dlp -x --ffmpeg-location ${FFMPEG} -t sleep --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail --cookies ${COOKIEFILE} "${URL}" || continue
 		fi
 	else
-                if "${USE_COOKIEFILE}"; then
-                        yt-dlp -x --ffmpeg-location ${FFMPEG} -t sleep  --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail --cookies ${COOKIEFILE} ${URL} || continue
-                else
-                        yt-dlp -x --ffmpeg-location ${FFMPEG} -t sleep  --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail ${URL} || continue
-                fi
+		if [ "${SPLIT_CHAPTERS}" ]; then
+			yt-dlp -x --ffmpeg-location ${FFMPEG} -t sleep --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail "${URL}" --split-chapters --force-keyframes-at-cuts || continue
+		else
+			yt-dlp -x --ffmpeg-location ${FFMPEG} -t sleep --js-runtimes node -f bestaudio --audio-format mp3 --audio-quality 320k --embed-thumbnail "${URL}" || continue                
+		fi
 	fi
 	mark_finished "${URL}" "${FILENAME_QUEUE}"
 done
